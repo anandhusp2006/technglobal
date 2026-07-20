@@ -1,0 +1,15 @@
+{
+  "best_model": "KNN",
+  "all_results": [
+    {
+      "model": "KNN",
+      "accuracy": 0.7273,
+      "f1_macro": 0.7857
+    },
+    {
+      "model": "SVM",
+      "accuracy": 0.4545,
+      "f1_macro": 0.1562
+    }
+  ]
+}

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spam Sorting Desk</title>
+<style>
+  :root{
+    --navy:#1B2A4A;
+    --navy-deep:#101B33;
+    --envelope:#EDE6D6;
+    --stamp-red:#C1440E;
+    --stamp-green:#3E7D4C;
+    --ink:#2A2A28;
+    --gold:#C9A05C;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 20% 10%, #24365e 0%, transparent 40%),
+      var(--navy-deep);
+    font-family: 'Georgia', 'Iowan Old Style', serif;
+    color:var(--envelope);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding: 28px 16px 60px;
+  }
+  header{
+    text-align:center;
+    margin-bottom: 28px;
+    max-width: 640px;
+  }
+  .eyebrow{
+    font-family: 'Courier New', monospace;
+    letter-spacing: 4px;
+    font-size: 12px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  h1{
+    font-size: clamp(28px, 5vw, 42px);
+    margin: 0 0 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  p.sub{
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: #b7c0d6;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .desk{
+    background: var(--envelope);
+    color: var(--ink);
+    width: 100%;
+    max-width: 640px;
+    border-radius: 4px;
+    padding: 28px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  .desk::before{
+    content:"";
+    position:absolute;
+    inset:10px;
+    border: 1px dashed rgba(42,42,40,0.25);
+    pointer-events:none;
+    border-radius: 2px;
+  }
+  label{
+    display:block;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #6b6355;
+    margin-bottom: 8px;
+  }
+  textarea{
+    width: 100%;
+    min-height: 120px;
+    padding: 14px;
+    font-family: 'Georgia', serif;
+    font-size: 16px;
+    border: 1px solid rgba(42,42,40,0.3);
+    border-radius: 3px;
+    background: #fffdf8;
+    resize: vertical;
+    color: var(--ink);
+  }
+  textarea:focus{
+    outline: 2px solid var(--navy);
+    outline-offset: 1px;
+  }
+  .row{
+    display:flex;
+    gap: 12px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  button{
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 13px;
+    padding: 12px 22px;
+    border-radius: 3px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  button:focus-visible{ outline: 3px solid var(--navy); outline-offset:2px; }
+  #sortBtn{
+    background: var(--navy);
+    color: var(--envelope);
+    flex: 1;
+    min-width: 160px;
+  }
+  #sortBtn:hover{ transform: translateY(-1px); box-shadow: 0 6px 14px rgba(27,42,74,0.35); }
+  #sampleBtn{
+    background: transparent;
+    color: var(--navy);
+    border: 1px solid var(--navy);
+  }
+  #sampleBtn:hover{ background: rgba(27,42,74,0.06); }
+
+  .result{
+    margin-top: 26px;
+    min-height: 90px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .stamp{
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: 3px;
+    padding: 14px 28px;
+    border: 4px solid;
+    border-radius: 6px;
+    transform: rotate(-4deg) scale(0.8);
+    opacity: 0;
+    text-transform: uppercase;
+    animation: thud 0.35s ease-out forwards;
+  }
+  .stamp.spam{ color: var(--stamp-red); border-color: var(--stamp-red); }
+  .stamp.ham{ color: var(--stamp-green); border-color: var(--stamp-green); }
+  @keyframes thud{
+    0%{ transform: rotate(-4deg) scale(1.4); opacity:0; }
+    60%{ transform: rotate(-4deg) scale(0.92); opacity:1; }
+    100%{ transform: rotate(-4deg) scale(1); opacity:1; }
+  }
+  .confidence{
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #6b6355;
+    text-align:center;
+    margin-top: -6px;
+  }
+  .status-line{
+    font-family:'Courier New', monospace;
+    font-size:13px;
+    color: #6b6355;
+  }
+  footer{
+    margin-top: 28px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: #7f89a3;
+    text-align:center;
+    max-width: 520px;
+  }
+  @media (max-width: 480px){
+    .desk{ padding: 20px; }
+    .row{ flex-direction: column; }
+    button{ width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Mail Room · Automated Sorting</div>
+    <h1>Spam Sorting Desk</h1>
+    <p class="sub">Drop a message on the desk. The classifier reads it, stamps it, and sends it to the right tray.</p>
+  </header>
+
+  <div class="desk">
+    <label for="msg">Message text</label>
+    <textarea id="msg" placeholder="Paste an email or SMS message here..."></textarea>
+    <div class="row">
+      <button id="sortBtn">Sort this message</button>
+      <button id="sampleBtn" type="button">Try a random sample</button>
+    </div>
+    <div class="result" id="result"></div>
+  </div>
+
+  <footer id="statusFooter" class="status-line">Connecting to classifier API...</footer>
+
+<script>
+const API_BASE = window.location.origin;
+const resultEl = document.getElementById('result');
+const statusFooter = document.getElementById('statusFooter');
+const msgEl = document.getElementById('msg');
+
+const SAMPLES = [
+  "Hey, are we still on for coffee tomorrow morning?",
+  "CONGRATULATIONS! You've been selected for a free $1000 gift card, click now!",
+  "Reminder: your dentist appointment is at 3pm on Thursday.",
+  "URGENT: your account will be suspended unless you verify immediately!",
+  "Can you send me the slides before the client call?",
+  "You've won a free cruise! Reply YES now to claim your prize."
+];
+
+async function checkHealth(){
+  try{
+    const res = await fetch(`${API_BASE}/api/health`);
+    const data = await res.json();
+    statusFooter.textContent = data.model_loaded
+      ? "Classifier API connected · model ready"
+      : "Classifier API connected · model not trained yet (run src/train.py)";
+  }catch(e){
+    statusFooter.textContent = "Could not reach the API. Start it with: python api/app.py";
+  }
+}
+checkHealth();
+
+document.getElementById('sampleBtn').addEventListener('click', () => {
+  msgEl.value = SAMPLES[Math.floor(Math.random() * SAMPLES.length)];
+});
+
+document.getElementById('sortBtn').addEventListener('click', async () => {
+  const text = msgEl.value.trim();
+  if(!text){
+    resultEl.innerHTML = `<div class="status-line">Type or paste a message first.</div>`;
+    return;
+  }
+  resultEl.innerHTML = `<div class="status-line">Sorting...</div>`;
+  try{
+    const res = await fetch(`${API_BASE}/api/predict`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({text})
+    });
+    const data = await res.json();
+    if(data.error){
+      resultEl.innerHTML = `<div class="status-line">${data.error}</div>`;
+      return;
+    }
+    const isSpam = data.prediction === 'spam';
+    resultEl.innerHTML = `
+      <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+        <div class="stamp ${isSpam ? 'spam' : 'ham'}">${isSpam ? 'Spam Tray' : 'Inbox'}</div>
+        <div class="confidence">confidence: ${data.confidence !== null ? (data.confidence*100).toFixed(1) + '%' : 'n/a'}</div>
+      </div>`;
+  }catch(e){
+    resultEl.innerHTML = `<div class="status-line">Request failed — is the API running?</div>`;
+  }
+});
+</script>
+</body>
+</html>
